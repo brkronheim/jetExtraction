@@ -23,6 +23,10 @@ process.demo = cms.EDAnalyzer('extractJets',
 
 )
 
+process.options = cms.untracked.PSet(
+     SkipEvent = cms.untracked.vstring('ProductNotFound')
+)
+
 process.TFileService = cms.Service("TFileService",
     fileName = cms.string(options.outputFile)
 )
