@@ -1,18 +1,3 @@
-// -*- C++ -*-
-//
-// Package:    ExoAnalysis/WR_MASS_PLOT
-// Class:      WR_MASS_PLOT
-//
-/**\class WR_MASS_PLOT WR_MASS_PLOT.cc ExoAnalysis/WR_MASS_PLOT/plugins/WR_MASS_PLOT.cc
- Description: [one line class summary]
- Implementation:
-     [Notes on implementation]
-*/
-//
-// Original Author:  Andrew Evans
-//         Created:  Mon, 14 Oct 2019 19:43:16 GMT
-//
-//
 
 
 // system include files
@@ -43,8 +28,6 @@
 
 #include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
 
-#include "HEEP/VID/interface/CutNrs.h"
-#include "HEEP/VID/interface/VIDCutCodes.h"
 
 #include "TLorentzVector.h"
 #include <TMatrixDSym.h>
@@ -56,10 +39,7 @@
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
-#include "ExoAnalysis/WR_lite/interface/eventBits.h"
-#include "ExoAnalysis/WR_lite/interface/eventInfo.h"
-#include "ExoAnalysis/WR_lite/interface/eventHistos.h"
-#include "ExoAnalysis/WR_lite/interface/neuralNet.h"
+
 
 //
 // class declaration
