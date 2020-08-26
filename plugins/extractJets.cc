@@ -114,9 +114,9 @@ extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	std::cout << "Gen particles" << std::endl;
 	for (std::vector<reco::GenParticle>::const_iterator iParticle = genParticles->begin(); iParticle != genParticles->end(); iParticle++) {
-		//std::cout << "Particle: " << iParticle << std::endl;
-		std::cout << "STATUS: " << iParticle->status() << " PDGID: " << iParticle->pdgId() << std::endl;
-		//std::cout << "STATUS: " << iParticle->status() << " PDGID: " << iParticle->pdgId() << " MOTHER: " << iParticle->mother()->pdgId() << std::endl;
+		if(iParticle->status()==1){
+			std::cout << "STATUS: " << iParticle->status() << " PDGID: " << iParticle->pdgId() << " MOTHER: " << iParticle->mother()->pdgId() << std::endl;
+		}
 	}
 
 }
