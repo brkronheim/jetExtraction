@@ -36,6 +36,9 @@
 #include <cmath>
 
 #include "TH1.h"
+#include "TTree.h"
+#include "TFile.h"
+
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
@@ -65,10 +68,29 @@ class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 		virtual void beginJob() override;
 		virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
 		virtual void endJob() override;
-		
+
 		// ----------member data ---------------------------
 
 		edm::EDGetToken m_genParticleToken;
+
+
+
+
+
+    // gen particle variables
+    std::vector<Int_t> genpdgid;
+    std::vector<Int_t> motherpdgid;
+
+    // event variables
+    ULong64_t event;
+    UInt_t run;
+    UInt_t lumi;
+
+    // Output
+    TTree* jetTree;
+    TFile* outputFile;
+
+
 
 };
 
@@ -107,29 +129,48 @@ extractJets::~extractJets()
 void
 extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-	
+  genpdgid.clear();
+  motherpdgid.clear();
 	edm::Handle<std::vector<reco::GenParticle>> genParticles;
 	iEvent.getByToken(m_genParticleToken, genParticles);
 
-	
+  // add event info to tree
+  event = iEvent.id().event();
+  run = iEvent.id().run();
+  lumi = iEvent.id().luminosityBlock();
+
+
 	std::cout << "Gen particles" << std::endl;
 	for (std::vector<reco::GenParticle>::const_iterator iParticle = genParticles->begin(); iParticle != genParticles->end(); iParticle++) {
 		if(iParticle->status()==1){
 			std::cout << "STATUS: " << iParticle->status() << " PDGID: " << iParticle->pdgId() << " MOTHER: " << iParticle->mother()->pdgId() << std::endl;
+      genpdgid.push_back(iParticle->pdgId());
+      motherpdgid.push_back(iParticle->mother()->pdgId());
 		}
 	}
+
+
+  // Save data in tree
+  jetTree->Fill();
 
 }
 // ------------ method called once each job just before starting event loop  ------------
 void
 extractJets::beginJob() {
-	edm::Service<TFileService> fs; 
+	edm::Service<TFileService> fs;
+  // create tree and add branches
+  jetTree = fs->make<TTree>("jetTree", "jetTree");
+  jetTree->Branch("genpdgid", &genpdgid);
+  jetTree->Branch("motherpdgid", &motherpdgid);
+  jetTree->Branch("event", &event);
+  jetTree->Branch("run", &run);
+  jetTree->Branch("lumi", &lumi);
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
 extractJets::endJob() {
-	
+
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
