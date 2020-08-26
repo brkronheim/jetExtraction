@@ -18,7 +18,7 @@ process.source = cms.Source("PoolSource",
     )
 )
 
-process.demo = cms.EDAnalyzer('extractJets.cc',
+process.demo = cms.EDAnalyzer('extractJets',
   genParticles = cms.InputTag("genParticles"),
 
 )
