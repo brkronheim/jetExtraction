@@ -1,4 +1,4 @@
-#Jet extraction
+# Jet extraction
 Extracting jet information out of Root files for machine learning work.
 
 ## Setup
@@ -31,5 +31,6 @@ scram b -j32
 ## Run
 To run the code execute
 ```
-cmsRun python/cfg.py inputFiles=file:data/signalFile.root outputFile=out.root
+cmsRun jetExctraction/python/cfg.py inputFiles=file:data/dataset1.root outputFile=out.root
 ```
+At the moment, the code should loop over all the events in the file and display the status, particle ID, and particle ID of the particle's mother for all status 1 (resultant) particles.
