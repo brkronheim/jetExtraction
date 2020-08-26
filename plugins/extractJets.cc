@@ -53,10 +53,10 @@
 
 using reco::TrackCollection;
 
-class WR_MASS_PLOT : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 	public:
-		explicit WR_MASS_PLOT(const edm::ParameterSet&);
-		~WR_MASS_PLOT();
+		explicit extractJets(const edm::ParameterSet&);
+		~extractJets();
 
 		static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
@@ -83,16 +83,16 @@ class WR_MASS_PLOT : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 // constructors and destructor
 //
-WR_MASS_PLOT::WR_MASS_PLOT(const edm::ParameterSet& iConfig)
+extractJets::extractJets(const edm::ParameterSet& iConfig)
 	:
-	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles"))),
+	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles")))
 
 {
    //now do what ever initialization is needed
 }
 
 
-WR_MASS_PLOT::~WR_MASS_PLOT()
+extractJets::~extractJets()
 {
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
@@ -105,7 +105,7 @@ WR_MASS_PLOT::~WR_MASS_PLOT()
 
 // ------------ method called for each event  ------------
 void
-WR_MASS_PLOT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
 	
 	edm::Handle<std::vector<reco::GenParticle>> genParticles;
@@ -120,19 +120,19 @@ WR_MASS_PLOT::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 }
 // ------------ method called once each job just before starting event loop  ------------
 void
-WR_MASS_PLOT::beginJob() {
+extractJets::beginJob() {
 	edm::Service<TFileService> fs; 
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
 void
-WR_MASS_PLOT::endJob() {
+extractJets::endJob() {
 	
 }
 
 // ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
 void
-WR_MASS_PLOT::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+extractJets::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
   //The following says we do not know what parameters are allowed so do no validation
   // Please change this to state exactly what you do use, even if it is no parameters
   edm::ParameterSetDescription desc;
