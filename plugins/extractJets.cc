@@ -65,30 +65,11 @@ class WR_MASS_PLOT : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 		virtual void beginJob() override;
 		virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
 		virtual void endJob() override;
-		double dR2(double eta1, double eta2, double phi1, double phi2);
-		double dPhi(double phi1, double phi2);
-		double transverseSphericity(math::XYZTLorentzVector p1, math::XYZTLorentzVector p2, math::XYZTLorentzVector p3);
-		void saveElectronData(eventBits * myEvent, double matched1Mass, double matched2Mass);
-		void saveMuonData(eventBits * myEvent, double matched1Mass, double matched2Mass);
 		
-		
-		eventHistos m_allEvents;
-		neuralNet networkResolved = neuralNet("/home/kronh006/Version3/CMSSW_10_4_0_patch1/src/ExoAnalysis/WR_lite/data/Resolved");
-		neuralNet networkSuperResolved = neuralNet("/home/kronh006/Version3/CMSSW_10_4_0_patch1/src/ExoAnalysis/WR_lite/data/SuperResolved");
-
 		// ----------member data ---------------------------
 
-		edm::EDGetTokenT<TrackCollection> tracksToken_;  //used to select what tracks to read from configuration file
 		edm::EDGetToken m_genParticleToken;
-		edm::EDGetToken m_highMuonToken;
-		edm::EDGetToken m_highElectronToken;
-		edm::EDGetToken m_AK4recoCHSJetsToken;
-		edm::EDGetToken m_genEventInfoToken;
-		edm::EDGetToken m_offlineVerticesToken;
-		
-		std::string m_dataSaveFile;
-		bool m_isSignal;
-		bool m_genTrainData;
+
 };
 
 //
@@ -104,16 +85,8 @@ class WR_MASS_PLOT : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 WR_MASS_PLOT::WR_MASS_PLOT(const edm::ParameterSet& iConfig)
 	:
-	tracksToken_(consumes<TrackCollection>(iConfig.getUntrackedParameter<edm::InputTag>("tracks"))),
 	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles"))),
-	m_highMuonToken (consumes<std::vector<pat::Muon>> (iConfig.getParameter<edm::InputTag>("highMuons"))),
-	m_highElectronToken (consumes<std::vector<pat::Electron>> (iConfig.getParameter<edm::InputTag>("highElectrons"))),
-	m_AK4recoCHSJetsToken (consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("AK4recoCHSJets"))),
-	m_genEventInfoToken (consumes<GenEventInfoProduct> (iConfig.getParameter<edm::InputTag>("genInfo"))),
-	m_offlineVerticesToken (consumes<std::vector<reco::Vertex>> (iConfig.getParameter<edm::InputTag>("vertices"))),
-	m_dataSaveFile (iConfig.getUntrackedParameter<std::string>("trainFile")),
-	m_isSignal (iConfig.getUntrackedParameter<bool>("isSignal")),
-	m_genTrainData (iConfig.getUntrackedParameter<bool>("genTrainData"))
+
 {
    //now do what ever initialization is needed
 }
