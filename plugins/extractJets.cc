@@ -19,10 +19,13 @@
  #include "DataFormats/TrackReco/interface/Track.h"
  #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+//#include "DataFormats/HepMCCandidate/interface/GenJet.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/PatCandidates/interface/Muon.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+
+
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/JetReco/interface/GenJet.h"
 
@@ -72,6 +75,9 @@ class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 		// ----------member data ---------------------------
 
 		edm::EDGetToken m_genParticleToken;
+		edm::EDGetToken genJetToken;
+		edm::EDGetToken patJetsPuppiToken;
+		edm::EDGetToken patJetsAK8Token;
 
 
 
@@ -108,6 +114,9 @@ class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 extractJets::extractJets(const edm::ParameterSet& iConfig)
 	:
 	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles")))
+	genJetToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("genJets")));
+	patJetsPuppiToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsAK8")));
+	patJetsAK8Token(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsPuppi")));
 
 {
    //now do what ever initialization is needed
@@ -129,42 +138,62 @@ extractJets::~extractJets()
 void
 extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  genpdgid.clear();
-  motherpdgid.clear();
+	genpdgid.clear();
+	motherpdgid.clear();
 	edm::Handle<std::vector<reco::GenParticle>> genParticles;
 	iEvent.getByToken(m_genParticleToken, genParticles);
+	
+	edm::Handle<std::vector<pat::Jet>> genJets;
+	iEvent.getByToken(m_genParticleToken, genJets);
+	
+	edm::Handle<std::vector<pat::Jet>> patJetsAK8;
+	iEvent.getByToken(m_genParticleToken, patJetsAK8);
+	
+	edm::Handle<std::vector<pat::Jet>> patJetsPuppi;
+	iEvent.getByToken(m_genParticleToken, patJetsPuppi);
 
-  // add event info to tree
-  event = iEvent.id().event();
-  run = iEvent.id().run();
-  lumi = iEvent.id().luminosityBlock();
+	// add event info to tree
+	event = iEvent.id().event();
+	run = iEvent.id().run();
+	lumi = iEvent.id().luminosityBlock();
 
 
 	std::cout << "Gen particles" << std::endl;
 	for (std::vector<reco::GenParticle>::const_iterator iParticle = genParticles->begin(); iParticle != genParticles->end(); iParticle++) {
-		if(iParticle->status()==1){
-			std::cout << "STATUS: " << iParticle->status() << " PDGID: " << iParticle->pdgId() << " MOTHER: " << iParticle->mother()->pdgId() << std::endl;
-      genpdgid.push_back(iParticle->pdgId());
-      motherpdgid.push_back(iParticle->mother()->pdgId());
-		}
+		
+	}
+	
+	std::cout << "Gen jets" << std::endl;
+	for (std::vector<pat::Jet>::const_iterator iParticle = genJets->begin(); iParticle != genJets->end(); iParticle++) {
+		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters << std::endl;
+	}
+	
+	std::cout << "Pat jets AK8" << std::endl;
+	for (std::vector<pat::Jet>::const_iterator iParticle = patJetsAK8->begin(); iParticle != patJetsAK8->end(); iParticle++) {
+		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters << std::endl;
+	}
+	
+	std::cout << "Pat jets Puppi" << std::endl;
+	for (std::vector<pat::Jet>::const_iterator iParticle = patJetsPuppi->begin(); iParticle != patJetsPuppi->end(); iParticle++) {
+		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters << std::endl;
 	}
 
 
-  // Save data in tree
-  jetTree->Fill();
+	// Save data in tree
+	jetTree->Fill();
 
 }
 // ------------ method called once each job just before starting event loop  ------------
 void
 extractJets::beginJob() {
 	edm::Service<TFileService> fs;
-  // create tree and add branches
-  jetTree = fs->make<TTree>("jetTree", "jetTree");
-  jetTree->Branch("genpdgid", &genpdgid);
-  jetTree->Branch("motherpdgid", &motherpdgid);
-  jetTree->Branch("event", &event);
-  jetTree->Branch("run", &run);
-  jetTree->Branch("lumi", &lumi);
+	// create tree and add branches
+	jetTree = fs->make<TTree>("jetTree", "jetTree");
+	jetTree->Branch("genpdgid", &genpdgid);
+	jetTree->Branch("motherpdgid", &motherpdgid);
+	jetTree->Branch("event", &event);
+	jetTree->Branch("run", &run);
+	jetTree->Branch("lumi", &lumi);
 }
 
 // ------------ method called once each job just after ending the event loop  ------------
