@@ -114,7 +114,7 @@ class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 extractJets::extractJets(const edm::ParameterSet& iConfig)
 	:
 	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles"))),
-	genJetToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("genJets"))),
+	genJetToken(consumes<std::vector<reco::GenJet>> (iConfig.getParameter<edm::InputTag>("genJets"))),
 	patJetsPuppiToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsAK8"))),
 	patJetsAK8Token(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsPuppi")))
 
@@ -143,7 +143,7 @@ extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	edm::Handle<std::vector<reco::GenParticle>> genParticles;
 	iEvent.getByToken(m_genParticleToken, genParticles);
 	
-	edm::Handle<std::vector<pat::Jet>> genJets;
+	edm::Handle<std::vector<reco::GenJet>> genJets;
 	iEvent.getByToken(genJetToken, genJets);
 	
 	edm::Handle<std::vector<pat::Jet>> patJetsAK8;
@@ -164,7 +164,7 @@ extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	}
 	
 	std::cout << "Gen jets" << std::endl;
-	for (std::vector<pat::Jet>::const_iterator iParticle = genJets->begin(); iParticle != genJets->end(); iParticle++) {
+	for (std::vector<reco::GenJet>::const_iterator iParticle = genJets->begin(); iParticle != genJets->end(); iParticle++) {
 		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters() << std::endl;
 	}
 	
