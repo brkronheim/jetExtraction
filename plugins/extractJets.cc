@@ -144,13 +144,13 @@ extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	iEvent.getByToken(m_genParticleToken, genParticles);
 	
 	edm::Handle<std::vector<pat::Jet>> genJets;
-	iEvent.getByToken(m_genParticleToken, genJets);
+	iEvent.getByToken(genJetToken, genJets);
 	
 	edm::Handle<std::vector<pat::Jet>> patJetsAK8;
-	iEvent.getByToken(m_genParticleToken, patJetsAK8);
+	iEvent.getByToken(patJetsPuppiToken, patJetsAK8);
 	
 	edm::Handle<std::vector<pat::Jet>> patJetsPuppi;
-	iEvent.getByToken(m_genParticleToken, patJetsPuppi);
+	iEvent.getByToken(patJetsAK8Token, patJetsPuppi);
 
 	// add event info to tree
 	event = iEvent.id().event();
