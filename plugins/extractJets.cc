@@ -141,6 +141,12 @@ void extractJets::analyze(const edm::Event &iEvent,
                 << " PDGID: " << iParticle->pdgId()
                 << " NUM DAUGHTER: " << iParticle->numberOfDaughters()
                 << std::endl;
+      int numDaughters = iParticle->numberofDaughters();
+      for (int i = 0; i < numDaughters; i++) {
+        std::cout << "  D_STATUS: " << iParticle->daughter(i)->status()
+                  << " D_PDGID: " << iParticle->daughter(i)->pdgId()
+                  << std::endl;
+      }
     }
   }
 
