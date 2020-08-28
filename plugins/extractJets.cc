@@ -1,8 +1,8 @@
 
 
 // system include files
-#include <memory>
 #include <fstream>
+#include <memory>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -11,23 +11,22 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 
-#include "FWCore/ServiceRegistry/interface/Service.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
 
-#include "FWCore/ParameterSet/interface/ParameterSet.h"
- #include "FWCore/Utilities/interface/InputTag.h"
- #include "DataFormats/TrackReco/interface/Track.h"
- #include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
-#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/JetReco/interface/GenJet.h"
 #include "DataFormats/PatCandidates/interface/Electron.h"
 #include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/TrackReco/interface/Track.h"
+#include "DataFormats/TrackReco/interface/TrackFwd.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/JetReco/interface/GenJet.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include "DataFormats/PatCandidates/interface/VIDCutFlowResult.h"
-
 
 #include "TLorentzVector.h"
 #include <TMatrixDSym.h>
@@ -35,14 +34,11 @@
 #include <TVectorD.h>
 #include <cmath>
 
+#include "TFile.h"
 #include "TH1.h"
 #include "TTree.h"
-#include "TFile.h"
-
 
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-
-
 
 //
 // class declaration
@@ -53,45 +49,36 @@
 // from  edm::one::EDAnalyzer<>
 // This will improve performance in multithreaded jobs.
 
-
 using reco::TrackCollection;
 
-class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
-	public:
-		explicit extractJets(const edm::ParameterSet&);
-		~extractJets();
+class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources> {
+public:
+  explicit extractJets(const edm::ParameterSet &);
+  ~extractJets();
 
-		static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+  static void fillDescriptions(edm::ConfigurationDescriptions &descriptions);
 
+private:
+  virtual void beginJob() override;
+  virtual void analyze(const edm::Event &, const edm::EventSetup &) override;
+  virtual void endJob() override;
 
-	private:
-		virtual void beginJob() override;
-		virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
-		virtual void endJob() override;
+  // ----------member data ---------------------------
 
-		// ----------member data ---------------------------
+  edm::EDGetToken m_genParticleToken;
 
-		edm::EDGetToken m_genParticleToken;
+  // gen particle variables
+  std::vector<Int_t> genpdgid;
+  std::vector<Int_t> motherpdgid;
 
+  // event variables
+  ULong64_t event;
+  UInt_t run;
+  UInt_t lumi;
 
-
-
-
-    // gen particle variables
-    std::vector<Int_t> genpdgid;
-    std::vector<Int_t> motherpdgid;
-
-    // event variables
-    ULong64_t event;
-    UInt_t run;
-    UInt_t lumi;
-
-    // Output
-    TTree* jetTree;
-    TFile* outputFile;
-
-
-
+  // Output
+  TTree *jetTree;
+  TFile *outputFile;
 };
 
 //
@@ -105,59 +92,65 @@ class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 // constructors and destructor
 //
-extractJets::extractJets(const edm::ParameterSet& iConfig)
-	:
-	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles")))
+extractJets::extractJets(const edm::ParameterSet &iConfig)
+    : m_genParticleToken(consumes<std::vector<reco::GenParticle>>(
+          iConfig.getParameter<edm::InputTag>("genParticles")))
 
 {
-   //now do what ever initialization is needed
+  // now do what ever initialization is needed
 }
 
-
-extractJets::~extractJets()
-{
-   // do anything here that needs to be done at desctruction time
-   // (e.g. close files, deallocate resources etc.)
+extractJets::~extractJets() {
+  // do anything here that needs to be done at desctruction time
+  // (e.g. close files, deallocate resources etc.)
 }
-
 
 //
 // member functions
 //
 
 // ------------ method called for each event  ------------
-void
-extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
-{
+void extractJets::analyze(const edm::Event &iEvent,
+                          const edm::EventSetup &iSetup) {
   genpdgid.clear();
   motherpdgid.clear();
-	edm::Handle<std::vector<reco::GenParticle>> genParticles;
-	iEvent.getByToken(m_genParticleToken, genParticles);
+  edm::Handle<std::vector<reco::GenParticle>> genParticles;
+  iEvent.getByToken(m_genParticleToken, genParticles);
 
   // add event info to tree
   event = iEvent.id().event();
   run = iEvent.id().run();
   lumi = iEvent.id().luminosityBlock();
 
+  std::cout << "Gen particles" << std::endl;
+  for (std::vector<reco::GenParticle>::const_iterator iParticle =
+           genParticles->begin();
+       iParticle != genParticles->end(); iParticle++) {
 
-	std::cout << "Gen particles" << std::endl;
-	for (std::vector<reco::GenParticle>::const_iterator iParticle = genParticles->begin(); iParticle != genParticles->end(); iParticle++) {
-		if(iParticle->status()==1){
-			std::cout << "STATUS: " << iParticle->status() << " PDGID: " << iParticle->pdgId() << " MOTHER: " << iParticle->mother()->pdgId() << std::endl;
+    // grab stable particles
+    if (iParticle->status() == 1) {
+      std::cout << "STATUS: " << iParticle->status()
+                << " PDGID: " << iParticle->pdgId()
+                << " MOTHER: " << iParticle->mother()->pdgId() << std::endl;
       genpdgid.push_back(iParticle->pdgId());
       motherpdgid.push_back(iParticle->mother()->pdgId());
-		}
-	}
+    }
 
+    if (iParticle->status() > 69 && iParticle->status() < 80) {
+      std::cout << "STATUS: " << iParticle->status()
+                << " PDGID: " << iParticle->pdgid()
+                << "NUM DAUGHTER: " << iParticle->numberOfDaughters()
+                << std::endl;
+    }
+  }
 
   // Save data in tree
   jetTree->Fill();
-
 }
-// ------------ method called once each job just before starting event loop  ------------
-void
-extractJets::beginJob() {
-	edm::Service<TFileService> fs;
+// ------------ method called once each job just before starting event loop
+// ------------
+void extractJets::beginJob() {
+  edm::Service<TFileService> fs;
   // create tree and add branches
   jetTree = fs->make<TTree>("jetTree", "jetTree");
   jetTree->Branch("genpdgid", &genpdgid);
@@ -167,27 +160,28 @@ extractJets::beginJob() {
   jetTree->Branch("lumi", &lumi);
 }
 
-// ------------ method called once each job just after ending the event loop  ------------
-void
-extractJets::endJob() {
+// ------------ method called once each job just after ending the event loop
+// ------------
+void extractJets::endJob() {}
 
-}
-
-// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
-void
-extractJets::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
-  //The following says we do not know what parameters are allowed so do no validation
-  // Please change this to state exactly what you do use, even if it is no parameters
+// ------------ method fills 'descriptions' with the allowed parameters for the
+// module  ------------
+void extractJets::fillDescriptions(
+    edm::ConfigurationDescriptions &descriptions) {
+  // The following says we do not know what parameters are allowed so do no
+  // validation
+  // Please change this to state exactly what you do use, even if it is no
+  // parameters
   edm::ParameterSetDescription desc;
   desc.setUnknown();
   descriptions.addDefault(desc);
 
-  //Specify that only 'tracks' is allowed
-  //To use, remove the default given above and uncomment below
-  //ParameterSetDescription desc;
-  //desc.addUntracked<edm::InputTag>("tracks","ctfWithMaterialTracks");
-  //descriptions.addDefault(desc);
+  // Specify that only 'tracks' is allowed
+  // To use, remove the default given above and uncomment below
+  // ParameterSetDescription desc;
+  // desc.addUntracked<edm::InputTag>("tracks","ctfWithMaterialTracks");
+  // descriptions.addDefault(desc);
 }
 
-//define this as a plug-in
+// define this as a plug-in
 DEFINE_FWK_MODULE(extractJets);
