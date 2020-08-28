@@ -113,10 +113,10 @@ class extractJets : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
 //
 extractJets::extractJets(const edm::ParameterSet& iConfig)
 	:
-	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles")))
-	genJetToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("genJets")));
-	patJetsPuppiToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsAK8")));
-	patJetsAK8Token(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsPuppi")));
+	m_genParticleToken(consumes<std::vector<reco::GenParticle>> (iConfig.getParameter<edm::InputTag>("genParticles"))),
+	genJetToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("genJets"))),
+	patJetsPuppiToken(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsAK8"))),
+	patJetsAK8Token(consumes<std::vector<pat::Jet>> (iConfig.getParameter<edm::InputTag>("patJetsPuppi")))
 
 {
    //now do what ever initialization is needed
@@ -165,17 +165,17 @@ extractJets::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 	
 	std::cout << "Gen jets" << std::endl;
 	for (std::vector<pat::Jet>::const_iterator iParticle = genJets->begin(); iParticle != genJets->end(); iParticle++) {
-		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters << std::endl;
+		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters() << std::endl;
 	}
 	
 	std::cout << "Pat jets AK8" << std::endl;
 	for (std::vector<pat::Jet>::const_iterator iParticle = patJetsAK8->begin(); iParticle != patJetsAK8->end(); iParticle++) {
-		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters << std::endl;
+		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters() << std::endl;
 	}
 	
 	std::cout << "Pat jets Puppi" << std::endl;
 	for (std::vector<pat::Jet>::const_iterator iParticle = patJetsPuppi->begin(); iParticle != patJetsPuppi->end(); iParticle++) {
-		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters << std::endl;
+		std::cout << "Number of Daughters:" << iParticle->numberOfDaughters() << std::endl;
 	}
 
 
