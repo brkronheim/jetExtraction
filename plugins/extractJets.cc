@@ -138,8 +138,8 @@ void extractJets::analyze(const edm::Event &iEvent,
 
     if (iParticle->status() > 69 && iParticle->status() < 80) {
       std::cout << "STATUS: " << iParticle->status()
-                << " PDGID: " << iParticle->pdgid()
-                << "NUM DAUGHTER: " << iParticle->numberOfDaughters()
+                << " PDGID: " << iParticle->pdgId()
+                << " NUM DAUGHTER: " << iParticle->numberOfDaughters()
                 << std::endl;
     }
   }
